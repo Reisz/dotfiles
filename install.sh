@@ -51,7 +51,7 @@ for package in "$@"; do
         arch)
             pkg=$(get_package ARCH)
             pkg=${pkg:-$(get_package DEFAULT)}
-            yay -T "$pkg" >/dev/null 2>&1 || pkgs_yay="$pkgs_yay $pkg"
+            yay -T "$pkg" >/dev/null 2>&1 && echo "$package already installed" || pkgs_yay="$pkgs_yay $pkg"
             ;;
         esac
     fi
@@ -65,6 +65,7 @@ case "$pkgs_yay" in
     ;;
 esac
 
+echo
 echo "Installing configurations..."
 echo
 
