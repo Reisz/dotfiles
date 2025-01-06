@@ -28,8 +28,8 @@ if [ "$1" = "--help" ]; then
     echo "They are whitespace separated key value pairs."
     echo
     echo "Keys:"
-    echo "  DEFAULT     Name in the system repository. Only used as fallback."
     echo "  ARCH        Name in the Arch Repository or AUR."
+    echo "  CARGO       Name of the corresponding Rust crate."
     echo
     echo
     echo "PACKAGE CONFIGURATION"
@@ -75,23 +75,30 @@ for package in "$@"; do
             awk -v key="$1" '$1==key {print $2}' "$conf"
         }
 
-        not_found() {
+        pkg=""
+
+        arch="$(get_package ARCH)"
+        if [ -z "$pkg" ] && [ -n "$arch" ] && [ "$os_id" = "arch" ]; then
+            pkg="$arch"
+            if yay -T "$pkg" >/dev/null 2>&1; then
+                echo "$pkg already installed"
+            else
+                echo "Installing $pkg via yay"
+                pkgs_yay="$pkgs_yay $pkg"
+            fi
+        fi
+
+        cargo="$(get_package CARGO)"
+        if [ -z "$pkg" ] && [ -n "$cargo" ]; then
+            pkg="$cargo"
+            echo "Installing $pkg via cargo"
+            cargo install "$pkg"
+        fi
+
+        if [ -z "$pkg" ]; then
             echo "$package not found"
             exit 1
-        }
-
-        already_installed() {
-            echo "$package already installed"
-        }
-
-        case $os_id in
-        arch)
-            pkg=$(get_package ARCH)
-            pkg=${pkg:-$(get_package DEFAULT)}
-            [ -z "$pkg" ] && not_found
-            yay -T "$pkg" >/dev/null 2>&1 && already_installed || pkgs_yay="$pkgs_yay $pkg"
-            ;;
-        esac
+        fi
     fi
 done
 
