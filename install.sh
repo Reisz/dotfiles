@@ -1,5 +1,6 @@
 #!/bin/sh
 set -eu
+trap "tput rmcup" EXIT
 
 if [ "$1" = "--help" ]; then
     echo "Usage: $(basename "$0") [PACKAGE]..."
@@ -92,7 +93,9 @@ for package in "$@"; do
         if [ -z "$pkg" ] && [ -n "$cargo" ]; then
             pkg="$cargo"
             echo "Installing $pkg via cargo"
+            tput smcup
             cargo install "$pkg"
+            tput rmcup
         fi
 
         if [ -z "$pkg" ]; then
@@ -102,8 +105,10 @@ for package in "$@"; do
     fi
 done
 
+tput smcup
 # shellcheck disable=SC2086
 [ -n "$pkgs_yay" ] && yay -Sq $pkgs_yay
+tput rmcup
 
 hook post-install "$@"
 
