@@ -12,6 +12,16 @@ if [ "$1" = "--help" ]; then
     echo "  $(basename "$0") *      Install all packages and configurations in this repository"
     echo
     echo
+    echo "HOOKS"
+    echo
+    echo "Hooks are located in <NAME>/hooks."
+    echo
+    echo "Hooks:"
+    echo "  pre-install.sh"
+    echo "  post-install.sh"
+    echo "  post-config.sh"
+    echo
+    echo
     echo "PACKAGE DEFINITIONS"
     echo
     echo "Package definitions are expected at <NAME> or <NAME>/package."
@@ -32,12 +42,28 @@ if [ "$1" = "--help" ]; then
     exit
 fi
 
-os_id=$(awk 'BEGIN {FS="="} $1=="ID" {print $2}' /etc/os-release)
-pkgs_yay=""
+hook() {
+    name="$1"
+    shift
 
+    echo
+    echo "Running $name hooks..."
+    echo
+
+    for package in "$@"; do
+        hook="$package/hooks/$name.sh"
+        [ -f "$hook" ] && echo "  $package $name" && "./$hook"
+    done || true
+}
+
+hook pre-install "$@"
+
+os_id=$(awk 'BEGIN {FS="="} $1=="ID" {print $2}' /etc/os-release)
+echo
 echo "Determining and installing packages for $os_id..."
 echo
 
+pkgs_yay=""
 for package in "$@"; do
     conf="$package"
     [ -d "$conf" ] && conf="$conf/package"
@@ -72,6 +98,8 @@ done
 # shellcheck disable=SC2086
 [ -n "$pkgs_yay" ] && yay -Sq $pkgs_yay
 
+hook post-install "$@"
+
 echo
 echo "Installing configurations..."
 echo
@@ -82,3 +110,5 @@ for package in "$@"; do
     [ -d "$package/config" ] && mkdir -p "$xdg_config" && stow -vR --dotfiles -t "$xdg_config" -d "$package" config
     [ -d "$package/home" ] && stow -vR --dotfiles -t "$HOME" -d "$package" config
 done
+
+hook post-config "$@"
