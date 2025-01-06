@@ -69,13 +69,8 @@ for package in "$@"; do
     fi
 done
 
-case "$pkgs_yay" in
-*[!\ ]*)
-    # shellcheck disable=SC2086
-    yay -Sq $pkgs_yay
-    echo
-    ;;
-esac
+# shellcheck disable=SC2086
+[ -n "$pkgs_yay" ] && yay -Sq $pkgs_yay
 
 echo
 echo "Installing configurations..."
