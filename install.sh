@@ -42,16 +42,28 @@ for package in "$@"; do
     conf="$package"
     [ -d "$conf" ] && conf="$conf/package"
 
+    [ "$conf" = "install.sh" ] && conf=""
+
     if [ -f "$conf" ]; then
         get_package() {
             awk -v key="$1" '$1==key {print $2}' "$conf"
+        }
+
+        not_found() {
+            echo "$package not found"
+            exit 1
+        }
+
+        already_installed() {
+            echo "$package already installed"
         }
 
         case $os_id in
         arch)
             pkg=$(get_package ARCH)
             pkg=${pkg:-$(get_package DEFAULT)}
-            yay -T "$pkg" >/dev/null 2>&1 && echo "$package already installed" || pkgs_yay="$pkgs_yay $pkg"
+            [ -z "$pkg" ] && not_found
+            yay -T "$pkg" >/dev/null 2>&1 && already_installed || pkgs_yay="$pkgs_yay $pkg"
             ;;
         esac
     fi
