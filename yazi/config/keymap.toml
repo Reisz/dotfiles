@@ -1,0 +1,4 @@
+[[manager.prepend_keymap]]
+on = "<C-n>"
+run = "shell 'ripdrag -xi \"$1\"'"
+desc = "Drag selected files"
