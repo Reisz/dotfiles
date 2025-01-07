@@ -29,7 +29,8 @@ if [ "$1" = "--help" ]; then
     echo "They are whitespace separated key value pairs."
     echo
     echo "Keys:"
-    echo "  ARCH        Name in the Arch Repository or AUR."
+    echo "  ARCH        Name in the Arch repository or AUR."
+    echo "  BREW        Name in the Homebrew repository."
     echo "  CARGO       Name of the corresponding Rust crate."
     echo
     echo
@@ -64,7 +65,13 @@ echo
 echo "Determining and installing packages for $os_id..."
 echo
 
+if [ "$os_id" = "ubuntu" ]; then
+    list_brew="$(brew list -q1 --installed-on-request)"
+fi
+
 pkgs_yay=""
+pkgs_brew=""
+# shellcheck disable=SC2086
 for package in "$@"; do
     conf="$package"
     [ -d "$conf" ] && conf="$conf/package"
@@ -89,6 +96,17 @@ for package in "$@"; do
             fi
         fi
 
+        brew="$(get_package BREW)"
+        if [ -z "$pkg" ] && [ -n "$brew" ] && [ "$os_id" = "ubuntu" ]; then
+            pkg="$brew"
+            if echo "$list_brew" | grep "$pkg" > /dev/null; then
+                echo "$pkg already installed"
+            else
+                echo "Installing $pkg via brew"
+                pkgs_brew="$pkgs_brew $pkg"
+            fi
+        fi
+
         cargo="$(get_package CARGO)"
         if [ -z "$pkg" ] && [ -n "$cargo" ]; then
             pkg="$cargo"
@@ -108,6 +126,8 @@ done
 tput smcup
 # shellcheck disable=SC2086
 [ -n "$pkgs_yay" ] && yay -Sq $pkgs_yay
+# shellcheck disable=SC2086
+[ -n "$pkgs_brew" ] && brew install $pkgs_brew
 tput rmcup
 
 hook post-install "$@"
