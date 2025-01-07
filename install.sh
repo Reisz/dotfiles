@@ -32,6 +32,7 @@ if [ "$1" = "--help" ]; then
     echo "  ARCH        Name in the Arch repository or AUR."
     echo "  BREW        Name in the Homebrew repository."
     echo "  CARGO       Name of the corresponding Rust crate."
+    echo "  UBUNTU      Name in the Ubuntu repositories."
     echo
     echo
     echo "PACKAGE CONFIGURATION"
@@ -71,6 +72,7 @@ fi
 
 pkgs_yay=""
 pkgs_brew=""
+pkgs_apt=""
 # shellcheck disable=SC2086
 for package in "$@"; do
     conf="$package"
@@ -116,6 +118,18 @@ for package in "$@"; do
             tput rmcup
         fi
 
+        ubuntu="$(get_package UBUNTU)"
+        if [ -z "$pkg" ] && [ -n "$ubuntu" ] && [ "$os_id" = "ubuntu" ]; then
+            pkg="$ubuntu"
+            if dpkg-query -s "$pkg" >/dev/null 2>&1; then
+                echo "$pkg already installed"
+            else
+                echo "Installing $pkg via apt"
+                pkgs_apt="$pkgs_apt $pkg"
+            fi
+        fi
+
+
         if [ -z "$pkg" ]; then
             echo "$package not found"
             exit 1
@@ -128,6 +142,8 @@ tput smcup
 [ -n "$pkgs_yay" ] && yay -Sq $pkgs_yay
 # shellcheck disable=SC2086
 [ -n "$pkgs_brew" ] && brew install $pkgs_brew
+# shellcheck disable=SC2086
+[ -n "$pkgs_apt" ] && sudo apt install $pkgs_apt
 tput rmcup
 
 hook post-install "$@"
