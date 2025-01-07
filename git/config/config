@@ -1,0 +1,35 @@
+[push]
+	autoSetupRemote = true
+[alias]
+	lg = log --pretty='format:%C(auto)%h %s%d' -10
+	f = fetch -p
+	s = switch
+	sc = switch -c
+	p = push
+	pf = push --force-with-lease origin
+    ca = commit --amend
+	cane = commit --amend --no-edit
+	cf = commit --fixup
+	ri = rebase -i
+    rit = -c core.editor=true rebase -i
+	ra = rebase --abort
+    rc = -c core.editor=true rebase --continue
+[rebase]
+	autoSquash = true
+	autoStash = true
+	updateRefs = true
+	missingCommitsCheck = warn
+	abbreviateCommands = true
+[rerere]
+	enabled = true
+[merge]
+	conflictstyle = zdiff3
+[diff]
+	algorithm = histogram
+[core]
+	pager = delta
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
