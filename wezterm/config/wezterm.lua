@@ -1,12 +1,18 @@
 local wezterm = require "wezterm"
 
+local ok, fontSize = pcall(require, "font-size")
+if not ok then
+    fontSize = 10.0
+end
+
 local config = wezterm.config_builder()
 
+
 config.font = wezterm.font "Fira Mono Nerd Font"
-config.font_size = 10.0
+config.font_size = fontSize
 
 config.window_frame = {
-    font_size = 10.0,
+    font_size = fontSize,
 }
 
 config.color_scheme = "Tokyo Night Storm"
