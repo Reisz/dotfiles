@@ -2,16 +2,11 @@
 set -eu
 trap "tput rmcup" EXIT
 
-if [ "$1" = "--help" ]; then
-    echo "Usage: $(basename "$0") [PACKAGE]..."
+if [ "${1:-}" = "--help" ]; then
+    echo "Usage: $(basename "$0")"
     echo "Install packages and configurations from this repository."
     echo
     echo "      --help        display this help and exit"
-    echo
-    echo "Examples:"
-    echo "  $(basename "$0") git    Install git package and configuration"
-    echo "  $(basename "$0") *      Install all packages and configurations in this repository"
-    echo
     echo
     echo "HOOKS"
     echo
@@ -45,21 +40,22 @@ if [ "$1" = "--help" ]; then
     exit
 fi
 
+packages="$(dirname "$0")/*"
+
 hook() {
     name="$1"
-    shift
 
     echo
     echo "Running $name hooks..."
     echo
 
-    for package in "$@"; do
+    for package in $packages; do
         hook="$package/hooks/$name.sh"
         [ -f "$hook" ] && echo "  $package $name" && "./$hook"
     done || true
 }
 
-hook pre-install "$@"
+hook pre-install
 
 os_id=$(awk 'BEGIN {FS="="} $1=="ID" {print $2}' /etc/os-release)
 echo
@@ -74,11 +70,11 @@ pkgs_yay=""
 pkgs_brew=""
 pkgs_apt=""
 # shellcheck disable=SC2086
-for package in "$@"; do
+for package in $packages; do
     conf="$package"
     [ -d "$conf" ] && conf="$conf/package"
 
-    [ "$conf" = "install.sh" ] && conf=""
+    [ "$conf" = "./install.sh" ] && conf=""
 
     if [ -f "$conf" ]; then
         get_package() {
@@ -101,7 +97,7 @@ for package in "$@"; do
         brew="$(get_package BREW)"
         if [ -z "$pkg" ] && [ -n "$brew" ] && [ "$os_id" = "ubuntu" ]; then
             pkg="$brew"
-            if echo "$list_brew" | grep "$pkg" > /dev/null; then
+            if echo "$list_brew" | grep "$pkg" >/dev/null; then
                 echo "$pkg already installed"
             else
                 echo "Installing $pkg via brew"
@@ -129,7 +125,6 @@ for package in "$@"; do
             fi
         fi
 
-
         if [ -z "$pkg" ]; then
             echo "$package not found"
             exit 1
@@ -146,17 +141,17 @@ tput smcup
 [ -n "$pkgs_apt" ] && sudo apt install $pkgs_apt
 tput rmcup
 
-hook post-install "$@"
+hook post-install
 
 echo
 echo "Installing configurations..."
 echo
 
 # <https://brandon.invergo.net/news/2012-05-26-using-gnu-stow-to-manage-your-dotfiles.html>
-for package in "$@"; do
+for package in $packages; do
     xdg_config="${XDG_CONFIG_HOME:-$HOME/.config}/$package"
     [ -d "$package/config" ] && mkdir -p "$xdg_config" && stow -vR --dotfiles -t "$xdg_config" -d "$package" config
     [ -d "$package/home" ] && stow -vR --dotfiles -t "$HOME" -d "$package" config
 done
 
-hook post-config "$@"
+hook post-config
