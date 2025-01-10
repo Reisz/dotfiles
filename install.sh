@@ -10,7 +10,7 @@ if [ "${1:-}" = "--help" ]; then
     echo
     echo "HOOKS"
     echo
-    echo "Hooks are located in <NAME>/hooks."
+    echo "Hooks are located in packages/<NAME>/hooks."
     echo
     echo "Hooks:"
     echo "  pre-install.sh"
@@ -20,7 +20,7 @@ if [ "${1:-}" = "--help" ]; then
     echo
     echo "PACKAGE DEFINITIONS"
     echo
-    echo "Package definitions are expected at <NAME> or <NAME>/package."
+    echo "Package definitions are expected at packages/<NAME> or packages/<NAME>/package."
     echo "They are whitespace separated key value pairs."
     echo
     echo "Keys:"
@@ -35,12 +35,12 @@ if [ "${1:-}" = "--help" ]; then
     echo "Package configuration uses GNU Stow to manage symlinks."
     echo
     echo "Target locations:"
-    echo "  <NAME>/config   \$XDG_CONFIG_HOME/<NAME> or \$HOME/.config/<NAME>"
-    echo "  <NAME>/home     \$HOME"
+    echo "  packages/<NAME>/config   \$XDG_CONFIG_HOME/<NAME> or \$HOME/.config/<NAME>"
+    echo "  packages/<NAME>/home     \$HOME"
     exit
 fi
 
-packages="$(dirname "$0")/*"
+packages="$(dirname "$0")/packages/*"
 
 hook() {
     name="$1"
@@ -73,8 +73,6 @@ pkgs_apt=""
 for package in $packages; do
     conf="$package"
     [ -d "$conf" ] && conf="$conf/package"
-
-    [ "$conf" = "./install.sh" ] && conf=""
 
     if [ -f "$conf" ]; then
         get_package() {
@@ -149,7 +147,7 @@ echo
 
 # <https://brandon.invergo.net/news/2012-05-26-using-gnu-stow-to-manage-your-dotfiles.html>
 for package in $packages; do
-    xdg_config="${XDG_CONFIG_HOME:-$HOME/.config}/$package"
+    xdg_config="${XDG_CONFIG_HOME:-$HOME/.config}/$(basename "$package")"
     [ -d "$package/config" ] && mkdir -p "$xdg_config" && stow -vR --dotfiles -t "$xdg_config" -d "$package" config
     [ -d "$package/home" ] && stow -vR --dotfiles -t "$HOME" -d "$package" config
 done
