@@ -1,4 +1,5 @@
 [alias]
+    pl = !git pull && git log ORIG_HEAD..
     lg = log -20
     s = switch
     sc = switch -c
@@ -25,6 +26,7 @@
     pretty = %C(yellow)%h %Cgreen%cs %<(15,trunc)%Cblue%an %C(auto)%s%d
 [merge]
     conflictstyle = zdiff3
+    stat = false
 [push]
     autoSetupRemote = true
 [rebase]
