@@ -29,6 +29,8 @@ if [ "${1:-}" = "--help" ]; then
     echo "  CARGO       Name of the corresponding Rust crate."
     echo "  UBUNTU      Name in the Ubuntu repositories."
     echo
+    echo "  GUI         Mark package as GUI app, which is excluded from wsl installs."
+    echo
     echo
     echo "PACKAGE CONFIGURATION"
     echo
@@ -40,7 +42,34 @@ if [ "${1:-}" = "--help" ]; then
     exit
 fi
 
+
 packages="$(dirname "$0")/packages/*"
+filter_packages() {
+    gui=true
+    if [ -f /proc/sys/fs/binfmt_misc/WSLInterop ]; then
+        gui=false
+    fi
+
+    for package in $packages; do
+        conf="$package"
+        [ -d "$conf" ] && conf="$conf/package"
+
+        ok=true
+
+        if [ ! -f "$conf" ]; then
+            ok=false
+        fi
+
+        if [ "$ok" = true ] && [ "$gui" = false ] && grep '^GUI' "$conf" > /dev/null; then
+            ok=false
+        fi
+
+        if [ "$ok" = true ]; then
+            echo "$package"
+        fi
+    done
+}
+packages="$(filter_packages)"
 
 hook() {
     name="$1"
@@ -74,59 +103,57 @@ for package in $packages; do
     conf="$package"
     [ -d "$conf" ] && conf="$conf/package"
 
-    if [ -f "$conf" ]; then
-        get_package() {
-            awk -v key="$1" '$1==key {print $2}' "$conf"
-        }
+    get_package() {
+        awk -v key="$1" '$1==key {print $2}' "$conf"
+    }
 
-        pkg=""
+    pkg=""
 
-        arch="$(get_package ARCH)"
-        if [ -z "$pkg" ] && [ -n "$arch" ] && [ "$os_id" = "arch" ]; then
-            pkg="$arch"
-            if yay -T "$pkg" >/dev/null 2>&1; then
-                echo "$pkg already installed"
-            else
-                echo "Installing $pkg via yay"
-                pkgs_yay="$pkgs_yay $pkg"
-            fi
+    arch="$(get_package ARCH)"
+    if [ -z "$pkg" ] && [ -n "$arch" ] && [ "$os_id" = "arch" ]; then
+        pkg="$arch"
+        if yay -T "$pkg" >/dev/null 2>&1; then
+            echo "$pkg already installed"
+        else
+            echo "Installing $pkg via yay"
+            pkgs_yay="$pkgs_yay $pkg"
         fi
+    fi
 
-        brew="$(get_package BREW)"
-        if [ -z "$pkg" ] && [ -n "$brew" ] && [ "$os_id" = "ubuntu" ]; then
-            pkg="$brew"
-            if echo "$list_brew" | grep "$pkg" >/dev/null; then
-                echo "$pkg already installed"
-            else
-                echo "Installing $pkg via brew"
-                pkgs_brew="$pkgs_brew $pkg"
-            fi
+    brew="$(get_package BREW)"
+    if [ -z "$pkg" ] && [ -n "$brew" ] && [ "$os_id" = "ubuntu" ]; then
+        pkg="$brew"
+        if echo "$list_brew" | grep "$pkg" >/dev/null; then
+            echo "$pkg already installed"
+        else
+            echo "Installing $pkg via brew"
+            pkgs_brew="$pkgs_brew $pkg"
         fi
+    fi
 
-        cargo="$(get_package CARGO)"
-        if [ -z "$pkg" ] && [ -n "$cargo" ]; then
-            pkg="$cargo"
-            echo "Installing $pkg via cargo"
-            tput smcup
-            cargo install "$pkg"
-            tput rmcup
-        fi
+    cargo="$(get_package CARGO)"
+    if [ -z "$pkg" ] && [ -n "$cargo" ]; then
+        pkg="$cargo"
+        echo "Installing $pkg via cargo"
+        tput smcup
+        cargo install "$pkg"
+        tput rmcup
+    fi
 
-        ubuntu="$(get_package UBUNTU)"
-        if [ -z "$pkg" ] && [ -n "$ubuntu" ] && [ "$os_id" = "ubuntu" ]; then
-            pkg="$ubuntu"
-            if dpkg-query -s "$pkg" >/dev/null 2>&1; then
-                echo "$pkg already installed"
-            else
-                echo "Installing $pkg via apt"
-                pkgs_apt="$pkgs_apt $pkg"
-            fi
+    ubuntu="$(get_package UBUNTU)"
+    if [ -z "$pkg" ] && [ -n "$ubuntu" ] && [ "$os_id" = "ubuntu" ]; then
+        pkg="$ubuntu"
+        if dpkg-query -s "$pkg" >/dev/null 2>&1; then
+            echo "$pkg already installed"
+        else
+            echo "Installing $pkg via apt"
+            pkgs_apt="$pkgs_apt $pkg"
         fi
+    fi
 
-        if [ -z "$pkg" ]; then
-            echo "$package not found"
-            exit 1
-        fi
+    if [ -z "$pkg" ]; then
+        echo "$package not found"
+        exit 1
     fi
 done
 
