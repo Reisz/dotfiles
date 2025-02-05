@@ -2,7 +2,6 @@
     lg = log -20
     s = switch
     sc = switch -c
-    p = push
     pf = push --force-with-lease origin
     ca = commit --amend
     cane = commit --amend --no-edit
