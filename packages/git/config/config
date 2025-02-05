@@ -1,5 +1,3 @@
-[push]
-	autoSetupRemote = true
 [alias]
 	lg = log --pretty='format:%C(auto)%h %s%d' -10
 	f = fetch -p
@@ -14,6 +12,19 @@
     rit = -c core.editor=true rebase -i
 	ra = rebase --abort
     rc = -c core.editor=true rebase --continue
+[core]
+    pager = delta
+[diff]
+	algorithm = histogram
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[merge]
+	conflictstyle = zdiff3
+[push]
+	autoSetupRemote = true
 [rebase]
 	autoSquash = true
 	autoStash = true
@@ -22,14 +33,3 @@
 	abbreviateCommands = true
 [rerere]
 	enabled = true
-[merge]
-	conflictstyle = zdiff3
-[diff]
-	algorithm = histogram
-[core]
-	pager = delta
-[filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-	required = true
