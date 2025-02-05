@@ -1,6 +1,5 @@
 [alias]
     lg = log --pretty='format:%C(auto)%h %s%d' -10
-    f = fetch -p
     s = switch
     sc = switch -c
     p = push
@@ -16,6 +15,8 @@
     pager = delta
 [diff]
     algorithm = histogram
+[fetch]
+    prune = true
 [filter "lfs"]
     clean = git-lfs clean -- %f
     smudge = git-lfs smudge -- %f
