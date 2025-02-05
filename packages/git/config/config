@@ -1,5 +1,5 @@
 [alias]
-    lg = log --pretty='format:%C(auto)%h %s%d' -10
+    lg = log -20
     s = switch
     sc = switch -c
     p = push
@@ -22,6 +22,8 @@
     smudge = git-lfs smudge -- %f
     process = git-lfs filter-process
     required = true
+[format]
+    pretty = %C(yellow)%h %Cgreen%cs %<(15,trunc)%Cblue%an %C(auto)%s%d
 [merge]
     conflictstyle = zdiff3
 [push]
