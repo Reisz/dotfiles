@@ -42,7 +42,6 @@ if [ "${1:-}" = "--help" ]; then
     exit
 fi
 
-
 packages="$(dirname "$0")/packages/*"
 filter_packages() {
     gui=true
@@ -60,7 +59,7 @@ filter_packages() {
             ok=false
         fi
 
-        if [ "$ok" = true ] && [ "$gui" = false ] && grep '^GUI' "$conf" > /dev/null; then
+        if [ "$ok" = true ] && [ "$gui" = false ] && grep '^GUI' "$conf" >/dev/null; then
             ok=false
         fi
 
