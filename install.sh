@@ -171,11 +171,17 @@ echo
 echo "Installing configurations..."
 echo
 
+stow_verbosity=3
+capture() {
+    output="$("$@" 2>&1)" || (printf "Command %s failed:\n%s\n" "$1" "$output" && exit)
+}
+
 # <https://brandon.invergo.net/news/2012-05-26-using-gnu-stow-to-manage-your-dotfiles.html>
 for package in $packages; do
+    echo "Configuring $package"
     xdg_config="${XDG_CONFIG_HOME:-$HOME/.config}/$(basename "$package")"
-    [ -d "$package/config" ] && mkdir -p "$xdg_config" && stow -vR --dotfiles -t "$xdg_config" -d "$package" config
-    [ -d "$package/home" ] && stow -vR --dotfiles -t "$HOME" -d "$package" config
+    [ -d "$package/config" ] && mkdir -p "$xdg_config" && capture stow --verbose="$stow_verbosity" -R --dotfiles -t "$xdg_config" -d "$package" config
+    [ -d "$package/home" ] && capture stow --verbose="$stow_verbosity" -R --dotfiles -t "$HOME" -d "$package" config
 done
 
 hook post-config
