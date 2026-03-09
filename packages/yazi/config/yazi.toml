@@ -1,0 +1,9 @@
+[opener]
+cut = [
+    { desc = "Cut", run = "losslesscut %s", orphan = true },
+]
+
+[open]
+prepend_rules = [
+ { mime = "video/*", use = ["play", "cut", "reveal"] },
+]
