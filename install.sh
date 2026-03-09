@@ -135,7 +135,7 @@ for package in $packages; do
         pkg="$cargo"
         echo "Installing $pkg via cargo"
         tput smcup
-        cargo install "$pkg"
+        cargo install --locked "$pkg"
         tput rmcup
     fi
 
