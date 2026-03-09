@@ -11,6 +11,9 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 
+-- Folding
+vim.opt.foldlevelstart = 99
+
 -- Buffer view
 vim.opt.wrap = false
 vim.opt.scrolloff = 8
