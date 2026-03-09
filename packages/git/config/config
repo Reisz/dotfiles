@@ -33,7 +33,7 @@
     autoSquash = true
     autoStash = true
     updateRefs = true
-    missingCommitsCheck = warn
+    missingCommitsCheck = error
     abbreviateCommands = true
 [rerere]
     enabled = true
