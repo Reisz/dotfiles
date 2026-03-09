@@ -4,13 +4,24 @@ local function quick_menu()
 end
 
 local keys = {
-    { "<leader>ha", function() require "harpoon":list():add() end, desc = "Harpoon: Add file" },
-    { "<leader>hl", quick_menu,                                    desc = "Harpoon: Show list" },
+    {
+        "<leader>ha",
+        function()
+            require("harpoon"):list():add()
+        end,
+        desc = "Harpoon: Add file",
+    },
+    { "<leader>hl", quick_menu, desc = "Harpoon: Show list" },
 }
 
 for i = 1, 9 do
-    table.insert(keys,
-        { ("<C-%d>"):format(i), function() require "harpoon":list():select(i) end, desc = "Harpoon: Show entry " .. i })
+    table.insert(keys, {
+        ("<C-%d>"):format(i),
+        function()
+            require("harpoon"):list():select(i)
+        end,
+        desc = "Harpoon: Show entry " .. i,
+    })
 end
 
 return {
