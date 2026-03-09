@@ -1,96 +1,117 @@
+local function textobjects_keys()
+    local keys = {
+        {
+            "<leader>a",
+            function()
+                require("nvim-treesitter-textobjects.swap").swap_next "@parameter.inner"
+            end,
+            desc = "Swap argument with next",
+        },
+        {
+            "<leader>A",
+            function()
+                require("nvim-treesitter-textobjects.swap").swap_previous "@parameter.inner"
+            end,
+            desc = "Swap argument with previous",
+        },
+    }
+
+    local select_mappings = {
+        { "a", "parameter" },
+        { "f", "function" },
+        { "c", "class" },
+        { "C", "comment" },
+    }
+    for _, mapping in ipairs(select_mappings) do
+    end
+end
+
+local function map_select(keybind, scope, desc)
+    scope = "@" .. scope
+    return {
+        keybind,
+        function()
+            require("nvim-treesitter-textobjects.select").select_textobject(scope, "textobjects")
+        end,
+        mode = { "x", "o" },
+        desc = desc,
+    }
+end
+
 return {
-    "nvim-treesitter/nvim-treesitter",
-    dependencies = {
-        "nvim-treesitter/nvim-treesitter-textobjects",
-        "nvim-treesitter/nvim-treesitter-context",
+    {
+        "nvim-treesitter/nvim-treesitter",
+        branch = "main",
+        dependencies = {
+            -- "nvim-treesitter/nvim-treesitter-context",
+        },
+        event = { "BufReadPost", "BufNewFile" },
+        opts = {},
+        config = function()
+            -- Enable highlights, indent and fold
+            vim.api.nvim_create_autocmd("FileType", {
+                callback = function(args)
+                    local lang = vim.treesitter.language.get_lang(args.match)
+                    if not lang then
+                        return
+                    end
+
+                    if not require("nvim-treesitter").get_installed("parser")[lang] then
+                        return
+                    end
+
+                    vim.treesitter.start(args.buf)
+
+                    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+
+                    vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
+                    vim.wo[0][0].foldmethod = "expr"
+                end,
+            })
+        end,
     },
-    build = ":TSUpdate",
-    event = { "BufReadPost", "BufNewFile" },
-    opts = {
-        ensure_installed = "all",
-        auto_install = false,
-        highlight = {
-            enable = true,
-            additional_vim_regex_highlighting = false,
-        },
-        incremental_selection = {
-            enable = true,
-            keymaps = {
-                node_incremental = "+",
-                node_decremental = "-",
-            },
-        },
-        indent = { enable = true },
-        textobjects = {
+    {
+        "nvim-treesitter/nvim-treesitter-textobjects",
+        branch = "main",
+        opts = {
             select = {
-                enable = true,
                 lookahead = true,
-                keymaps = {
-                    ["ia"] = { query = "@parameter.inner", desc = "inner argument" },
-                    ["aa"] = { query = "@parameter.outer", desc = "an argument" },
-                    ["if"] = { query = "@function.inner", desc = "inner function" },
-                    ["af"] = { query = "@function.outer", desc = "a function" },
-                    ["ic"] = { query = "@class.inner", desc = "inner class" },
-                    ["ac"] = { query = "@class.outer", desc = "a class" },
-                    ["aC"] = { query = "@comment.outer", desc = "a comment" },
-                },
                 include_surrounding_whitespace = function(data)
                     local settings = {
                         ["@parameter.outer_v"] = true,
                         ["@function.outer_v"] = true,
                         ["@class.outer_v"] = true,
                     }
-
                     return settings[data.query_string .. "_" .. data.selection_mode]
                 end,
             },
-            swap = {
-                enable = true,
-                swap_next = {
-                    ["<leader>a"] = { query = "@parameter.inner", desc = "Swap argument with next" },
-                },
-                swap_previous = {
-                    ["<leader>A"] = { query = "@parameter.inner", desc = "Swap argument with previous" },
-                },
+            move = {
+                set_jumps = true,
             },
         },
-        nvim_next = {
-            enable = true,
-            textobjects = {
-                move = {
-                    enable = true,
-                    set_jumps = true,
-                    goto_next_start = {
-                        ["]a"] = { query = "@parameter.inner", desc = "Next argument start" },
-                        ["]m"] = { query = "@function.outer", desc = "Next method start" },
-                        ["]]"] = { query = "@class.outer", desc = "Next class start" },
-                    },
-                    goto_next_end = {
-                        ["]A"] = { query = "@parameter.inner", desc = "Next argument end" },
-                        ["]M"] = { query = "@function.outer", desc = "Next method end" },
-                        ["]["] = { query = "@class.outer", desc = "Next class end" },
-                    },
-                    goto_previous_start = {
-                        ["[a"] = { query = "@parameter.inner", desc = "Previous argument start" },
-                        ["[m"] = { query = "@function.outer", desc = "Previous method start" },
-                        ["[["] = { query = "@class.outer", desc = "Previous class start" },
-                    },
-                    goto_previous_end = {
-                        ["[A"] = { query = "@parameter.inner", desc = "Previous argument end" },
-                        ["[M"] = { query = "@function.outer", desc = "Previous method end" },
-                        ["[]"] = { query = "@class.outer", desc = "Previous class end" },
-                    },
-                },
+        keys = {
+            map_select("ia", "parameter.inner", "inner argument"),
+            map_select("aa", "parameter.outer", "an argument"),
+            map_select("if", "function.inner", "inner function"),
+            map_select("af", "function.outer", "a function"),
+            map_select("ic", "class.inner", "inner class"),
+            map_select("ac", "class.outer", "a class"),
+            map_select("aC", "comment.outer", "a comment"),
+
+            {
+                "<leader>a",
+                function()
+                    require("nvim-treesitter-textobjects.swap").swap_next "@parameter.inner"
+                end,
+                desc = "Swap argument with next",
+            },
+            {
+                "<leader>A",
+                function()
+                    require("nvim-treesitter-textobjects.swap").swap_previous "@parameter.inner"
+                end,
+                desc = "Swap argument with previous",
             },
         },
     },
-    config = function(_, opts)
-        require("nvim-next.integrations").treesitter_textobjects()
-        require("nvim-treesitter.configs").setup(opts)
-        require("treesitter-context").setup {}
-
-        vim.opt.foldmethod = "expr"
-        vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-        vim.opt.foldenable = false
-    end,
 }
