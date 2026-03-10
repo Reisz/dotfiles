@@ -2,7 +2,7 @@ return {
     {
         "nvim-treesitter/nvim-treesitter",
         branch = "main",
-        event = { "LazyFile", "VeryLazy" },
+        event = { "BufReadPost", "BufNewFile" },
         opts = {},
         config = function()
             -- Enable highlights, indent and fold
@@ -30,7 +30,7 @@ return {
     {
         "nvim-treesitter/nvim-treesitter-textobjects",
         branch = "main",
-        event = "VeryLazy",
+        event = { "BufReadPost", "BufNewFile" },
         opts = {
             select = {
                 lookahead = true,
@@ -149,6 +149,6 @@ return {
     },
     {
         "nvim-treesitter/nvim-treesitter-context",
-        event = "LazyFile",
+        event = { "BufReadPost", "BufNewFile" },
     }
 }
