@@ -24,7 +24,9 @@
     process = git-lfs filter-process
     required = true
 [format]
-    pretty = %C(yellow)%h %Cgreen%cs %<(15,trunc)%Cblue%an %C(auto)%s%d
+    pretty = %C(yellow)%h %Cgreen%cd %<(20,trunc)%Cblue%an %C(auto)%s%d
+[log]
+    date = "format:%b %d"
 [merge]
     conflictstyle = zdiff3
     stat = false
