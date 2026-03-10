@@ -11,11 +11,10 @@ end
 return {
     {
         "nvim-telescope/telescope-fzf-native.nvim",
-        build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+        build = "make",
     },
     {
         "nvim-telescope/telescope.nvim",
-        branch = "0.1.x",
         dependencies = {
             "nvim-lua/plenary.nvim",
             "nvim-telescope/telescope-fzf-native.nvim",
@@ -86,9 +85,9 @@ return {
         end,
         keys = {
             -- Files
-            { "<leader>ff", telescope "find_files", desc = "Find files" },
+            { "<leader>ff", telescope "find_files",                        desc = "Find files" },
             { "<leader>fF", telescope("find_files", { no_ignore = true }), desc = "Find all files" },
-            { "<leader>fg", telescope "git_files", desc = "Find git files" },
+            { "<leader>fg", telescope "git_files",                         desc = "Find git files" },
             -- Browser
             {
                 "<leader>fb",
@@ -105,19 +104,19 @@ return {
                 desc = "Open root file browser",
             },
             -- Search
-            { "<leader>f/", telescope "live_grep", desc = "Find text" },
-            { "<leader>f/", telescope "grep_string", mode = "v", desc = "Find text" },
+            { "<leader>f/", telescope "live_grep",                 desc = "Find text" },
+            { "<leader>f/", telescope "grep_string",               mode = "v",                        desc = "Find text" },
             { "<leader>f*", telescope "current_buffer_fuzzy_find", desc = "Find in buffer" },
             -- LSP
-            { "<leader>fr", telescope "lsp_references", desc = "List document symbols" },
-            { "<leader>fs", telescope "lsp_document_symbols", desc = "List document symbols" },
-            { "<leader>fS", telescope "lsp_workspace_symbols", desc = "List workspace symbols" },
-            { "<leader>fd", telescope "diagnostics", desc = "List diagnostics" },
+            { "<leader>fr", telescope "lsp_references",            desc = "List document symbols" },
+            { "<leader>fs", telescope "lsp_document_symbols",      desc = "List document symbols" },
+            { "<leader>fS", telescope "lsp_workspace_symbols",     desc = "List workspace symbols" },
+            { "<leader>fd", telescope "diagnostics",               desc = "List diagnostics" },
             -- Other
-            { "<leader>f.", telescope "resume", desc = "Telescope resume previous" },
-            { "<leader>fq", telescope "quickfix", desc = "Telescope quickfix" },
-            { "<leader>fh", telescope "help_tags", desc = "Find in help" },
-            { "<leader>fk", telescope "keymaps", desc = "Find in keymaps" },
+            { "<leader>f.", telescope "resume",                    desc = "Telescope resume previous" },
+            { "<leader>fq", telescope "quickfix",                  desc = "Telescope quickfix" },
+            { "<leader>fh", telescope "help_tags",                 desc = "Find in help" },
+            { "<leader>fk", telescope "keymaps",                   desc = "Find in keymaps" },
         },
     },
 }
