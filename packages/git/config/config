@@ -6,6 +6,7 @@
     pf = push --force-with-lease origin
     ca = commit --amend
     cane = commit --amend --no-edit
+    canepf = !git cane && git pf
     cf = commit --fixup
     ri = rebase -i
     rit = -c core.editor=true rebase -i
