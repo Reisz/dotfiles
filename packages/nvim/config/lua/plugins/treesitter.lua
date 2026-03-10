@@ -2,10 +2,7 @@ return {
     {
         "nvim-treesitter/nvim-treesitter",
         branch = "main",
-        dependencies = {
-            -- "nvim-treesitter/nvim-treesitter-context",
-        },
-        event = { "BufReadPost", "BufNewFile" },
+        event = { "LazyFile", "VeryLazy" },
         opts = {},
         config = function()
             -- Enable highlights, indent and fold
@@ -150,4 +147,8 @@ return {
             end
         end,
     },
+    {
+        "nvim-treesitter/nvim-treesitter-context",
+        event = "LazyFile",
+    }
 }
