@@ -5,15 +5,16 @@ return {
         event = { "BufReadPost", "BufNewFile" },
         opts = {},
         config = function()
+            local lang_index = {}
+            for _, lang in ipairs(require("nvim-treesitter").get_installed "parser") do
+                lang_index[lang] = true
+            end
+
             -- Enable highlights, indent and fold
             vim.api.nvim_create_autocmd("FileType", {
                 callback = function(args)
                     local lang = vim.treesitter.language.get_lang(args.match)
-                    if not lang then
-                        return
-                    end
-
-                    if not require("nvim-treesitter").get_installed("parser")[lang] then
+                    if not lang or not lang_index[lang] then
                         return
                     end
 
