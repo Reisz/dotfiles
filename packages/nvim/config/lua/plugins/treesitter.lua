@@ -36,8 +36,8 @@ return {
                 lookahead = true,
                 include_surrounding_whitespace = {
                     { query = "@parameter.outer", mode = "v" },
-                    { query = "@function.outer",  mode = "v" },
-                    { query = "@class.outer",     mode = "v" },
+                    { query = "@function.outer", mode = "v" },
+                    { query = "@class.outer", mode = "v" },
                 },
                 keys = {
                     ["ia"] = { query = "parameter", desc = "inner argument" },
@@ -47,13 +47,13 @@ return {
                     ["ic"] = { query = "class" },
                     ["ac"] = { query = "class" },
                     ["aC"] = { query = "comment" },
-                }
+                },
             },
             swap = {
                 keys = {
                     ["<leader>a"] = { query = "@parameter.inner", desc = "argument" },
                     ["<leader>A"] = { query = "@parameter.inner", desc = "argument" },
-                }
+                },
             },
             move = {
                 set_jumps = true,
@@ -70,7 +70,7 @@ return {
                     ["[["] = { query = "@class.outer", desc = "class" },
                     ["]["] = { query = "@class.outer", desc = "class" },
                     ["[]"] = { query = "@class.outer", desc = "class" },
-                }
+                },
             },
         },
         config = function(_, opts)
@@ -100,9 +100,9 @@ return {
 
                 local query = ("@%s.%s"):format(key_opts.query, inner_outer_query)
                 local desc = key_opts.desc or ("%s %s"):format(inner_outer_desc, key_opts.query)
-                vim.keymap.set({ "x", "o" }, keybind,
-                    function() require("nvim-treesitter-textobjects.select").select_textobject(query, "textobjects") end,
-                    { desc = desc })
+                vim.keymap.set({ "x", "o" }, keybind, function()
+                    require("nvim-treesitter-textobjects.select").select_textobject(query, "textobjects")
+                end, { desc = desc })
             end
 
             -- Swap keybinds
@@ -115,9 +115,9 @@ return {
 
                 local method = "swap_" .. next_prev
                 local desc = ("Swap %s with %s"):format(key_opts.desc, next_prev)
-                vim.keymap.set("n", keybind,
-                    function() require("nvim-treesitter-textobjects.swap")[method](key_opts.query, "textobjects") end,
-                    { desc = desc })
+                vim.keymap.set("n", keybind, function()
+                    require("nvim-treesitter-textobjects.swap")[method](key_opts.query, "textobjects")
+                end, { desc = desc })
             end
 
             -- Move keybinds
@@ -134,21 +134,24 @@ return {
 
                 local start_end = "start"
                 local final_key = keybind:sub(-1)
-                if (final_key:find("%a") and final_key == final_key:upper()) or (final_key:find("%A") and final_key ~= next_prev_key) then
+                if
+                    (final_key:find "%a" and final_key == final_key:upper())
+                    or (final_key:find "%A" and final_key ~= next_prev_key)
+                then
                     start_end = "end"
                 end
 
                 local method = ("goto_%s_%s"):format(next_prev, start_end)
                 local next_prev_desc = next_prev:sub(1, 1):upper() .. next_prev:sub(2)
                 local desc = ("%s %s %s"):format(next_prev_desc, key_opts.desc, start_end)
-                vim.keymap.set({ "n", "x", "o" }, keybind,
-                    function() require("nvim-treesitter-textobjects.move")[method](key_opts.query, "textobjects") end,
-                    { desc = desc })
+                vim.keymap.set({ "n", "x", "o" }, keybind, function()
+                    require("nvim-treesitter-textobjects.move")[method](key_opts.query, "textobjects")
+                end, { desc = desc })
             end
         end,
     },
     {
         "nvim-treesitter/nvim-treesitter-context",
         event = { "BufReadPost", "BufNewFile" },
-    }
+    },
 }
