@@ -33,6 +33,9 @@ return {
                     },
                 },
                 pickers = {
+                    find_files = {
+                        follow = true,
+                    },
                     git_files = {
                         show_untracked = true,
                     },
