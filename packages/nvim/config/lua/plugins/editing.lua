@@ -26,6 +26,13 @@ return {
     { "arnamak/stay-centered.nvim", opts = {} },
     {
         "https://codeberg.org/andyg/leap.nvim",
+        opts = {
+            vim_opts = {
+                ["go.ignorecase"] = true,
+                ["go.smartcase"] = true,
+                ["bo.modeline"] = false,
+            },
+        },
         config = function(_, opts)
             local leap = require "leap"
             leap.setup(opts)
