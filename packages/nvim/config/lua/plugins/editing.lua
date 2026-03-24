@@ -26,26 +26,13 @@ return {
     { "arnamak/stay-centered.nvim", opts = {} },
     {
         "https://codeberg.org/andyg/leap.nvim",
-        dependencies = { "nvim-next" },
         config = function(_, opts)
             local leap = require "leap"
             leap.setup(opts)
 
-            local leap_backward, leap_forward = require("nvim-next.move").make_repeatable_pair(function(args)
-                leap.leap { ["repeat"] = args.repeating, backward = true }
-            end, function(args)
-                leap.leap { ["repeat"] = args.repeating }
-            end)
-
-            vim.keymap.set({ "n", "x", "o" }, "s", leap_forward, { desc = "Leap forwards" })
-            vim.keymap.set({ "n", "x", "o" }, "S", leap_backward, { desc = "Leap backwards" })
-            vim.keymap.set({ "n", "o" }, "gs", function()
-                require("leap.remote").action()
-            end, { desc = "Phantom Leap" })
-
-            vim.keymap.set({ "n", "x", "o" }, "ga", function()
-                require("leap.treesitter").select()
-            end, { desc = "Leap Tree-sitter selection" })
+            vim.keymap.set({ "n", "x", "o" }, "s", "<Plug>(leap-forward)", { desc = "Leap forward" })
+            vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-backward)", { desc = "Leap backward" })
+            vim.keymap.set("n", "gs", "<Plug>(leap-from-window)", { desc = "Leap from window" })
         end,
     },
 
