@@ -6,6 +6,11 @@ return {
         config = function(_, opts)
             vim.api.nvim_create_autocmd("LspAttach", {
                 callback = function(event)
+                    local client = vim.lsp.get_client_by_id(event.data.client_id)
+                    if opts[client.name] and opts[client.name].after_attach then
+                        opts[client.name].after_attach(client, event.buf)
+                    end
+
                     local function map(modes, lhs, rhs, desc)
                         vim.keymap.set(modes, lhs, rhs, { buffer = event.buf, desc = desc })
                     end

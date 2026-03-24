@@ -4,11 +4,11 @@ return {
         opts = {
             clangd = {
                 cmd = { "clangd", "--header-insertion=never" },
-                on_attach = function()
+                after_attach = function()
                     vim.keymap.set(
                         "n",
                         "gI",
-                        "<cmd>ClangdSwitchSourceHeader<cr>",
+                        "<cmd>LspClangdSwitchSourceHeader<cr>",
                         { desc = "Switch between source and header" }
                     )
                 end,
